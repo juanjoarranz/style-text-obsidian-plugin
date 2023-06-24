@@ -6,3 +6,16 @@ available in the app when your plugin is enabled.
 If your plugin does not need CSS, delete this file.
 
 */
+
+.setting_text input {
+	width: 400px;
+}
+
+.container_button {
+	text-align: right;
+}
+
+.instructions {
+	font-size: 14px;
+	font-style: italic;
+}

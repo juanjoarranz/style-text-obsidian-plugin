@@ -37,4 +37,5 @@ With the Commander configuration:
 
 If you enjoy Style Text Obsidian Plugin then please support my work by buying me a coffee on [https://ko-fi.com/F1F6H4TAR](https://ko-fi.com/F1F6H4TAR)
 
-[<img src="./assets/buy-me-a-coffee.png" alt= “” width="250px">](https://ko-fi.com/F1F6H4TAR)
+<!-- [<img src="./assets/buy-me-a-coffee.png" alt= “” width="200px">](https://ko-fi.com/F1F6H4TAR) -->
+[<img src="https://cdn.ko-fi.com/cdn/kofi3.png?v=3" alt= “” width="150px">](https://ko-fi.com/F1F6H4TAR)

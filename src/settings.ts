@@ -38,6 +38,8 @@ export class GeneralSettingsTab extends PluginSettingTab {
 		this.plugin.settings.styles.forEach((s, i) => this.addStyle(settingContainer, i + 1));
 
 		this.addInstructions(containerEl);
+
+		this.donate(containerEl);
 	}
 
 	private addStyle(containerEl: HTMLElement, counter?: number) {
@@ -103,5 +105,15 @@ export class GeneralSettingsTab extends PluginSettingTab {
 		removeUl.createEl('li', { text: 'Open the Command Palette: <Ctrl> or <Cmd> + <P>' });
 		removeUl.createEl('li', { text: 'Look up: "Style Remove"' });
 		removeUl.createEl('li', { text: 'Press <Enter>' });
+	}
+
+	private donate(containerEl: HTMLElement) {
+		const donateContainer = containerEl.createEl('div', { cls: 'donate' });
+		donateContainer.setCssStyles({ marginTop: '40px' });
+
+		let buyMeCoffeeImage = new Image(130);
+		buyMeCoffeeImage.src = 'https://cdn.ko-fi.com/cdn/kofi3.png?v=3';
+		donateContainer.createEl('a', { href: 'https://ko-fi.com/F1F6H4TAR', text: '' }).appendChild(buyMeCoffeeImage);
+
 	}
 }

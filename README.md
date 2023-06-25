@@ -32,3 +32,9 @@ That results with:
 
 With the Commander configuration:
 ![image](./assets/img-20230625-130524.png)
+
+## Say Thank You
+
+If you enjoy Style Text Obsidian Plugin then please support my work by buying me a coffee on [https://ko-fi.com/F1F6H4TAR](https://ko-fi.com/F1F6H4TAR)
+
+[![image](./assets/buy-me-a-coffee.png)](https://ko-fi.com/F1F6H4TAR)

@@ -7,15 +7,54 @@ If your plugin does not need CSS, delete this file.
 
 */
 
-.setting_text input {
-	width: 400px;
-}
+
 
 .container_button {
 	text-align: right;
+	margin-bottom: 20px;
+}
+
+.container_button button {
+	background-color: var(--interactive-accent)
 }
 
 .instructions {
 	font-size: 14px;
-	font-style: italic;
+	font-style: normal;
+}
+
+p.instructions {
+	margin-bottom: 5px;
+}
+
+ul.instructions {
+	margin-top: 1px;
+}
+
+
+.setting-item-container {
+	display: flex;
+	flex-direction: row;
+	border-top: 1px solid var(--background-modifier-border);
+	padding-top: 11px;
+}
+
+.setting-item-text {
+	width: 100%;
+	flex: 0.9;
+}
+
+.setting-item-text input {
+	min-width: 400px;
+	width: 100%;
+}
+
+.delete-button-container {
+	text-align: right;
+	flex: 0.1;
+}
+
+.setting-item-delete-style-button {
+	margin-right: 10px;
+	background-color: var(--background-modifier-error);
 }

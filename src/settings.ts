@@ -22,7 +22,10 @@ export class GeneralSettingsTab extends PluginSettingTab {
 		const { containerEl } = this;
 
 		containerEl.empty();
-		containerEl.createEl('h2', { text: 'Style Text' });
+		containerEl.createEl('h1', { text: 'Style Text' });
+		containerEl.createEl('div').createEl('span', { text: 'Created by ' }).createEl('a', { text: 'Juanjo Arranz', href: 'https://github.com/juanjoarranz' });
+
+		containerEl.createEl('h2', { text: 'Plugin Settings' });
 		containerEl.createEl('p', { text: 'CSS styles to be applied to the selected text.' });
 
 		// Add Style Button
@@ -99,6 +102,6 @@ export class GeneralSettingsTab extends PluginSettingTab {
 		removeUl.createEl('li', { text: 'Select the styled text on the editor' });
 		removeUl.createEl('li', { text: 'Open the Command Palette: <Ctrl> or <Cmd> + <P>' });
 		removeUl.createEl('li', { text: 'Look up: "Style Remove"' });
-		removeUl.createEl('li', { text: 'Click <Enter>' });
+		removeUl.createEl('li', { text: 'Press <Enter>' });
 	}
 }

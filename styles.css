@@ -19,7 +19,8 @@ If your plugin does not need CSS, delete this file.
 }
 
 .instructions {
-	font-size: 14px;
+	color: var(--text-muted);
+	font-size: var(--font-ui-smaller);
 	font-style: normal;
 }
 

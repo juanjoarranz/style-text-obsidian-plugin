@@ -21,6 +21,7 @@ export default class StyleText extends Plugin {
 			this.addStyleCommand(value, index + 1);
 		});
 
+		this.updateBodyListClass();
 		this.addSettingTab(new GeneralSettingsTab(this.app, this));
 	}
 
@@ -44,14 +45,20 @@ export default class StyleText extends Plugin {
 
 	// index: 1-based
 	addStyleCommand(style: string, index: number) {
+		const isHighlight = style.indexOf("background-color") !== -1;
+		const tag = isHighlight ? "mark" : "span";
 		this.addCommand({
 			id: `style${index}`,
 			name: `Style ${index}`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				const selection = editor.getSelection();
-				editor.replaceSelection(`<span style="${style}">${selection}</span>`)
+				editor.replaceSelection(`<${tag} style="${style}">${selection}</${tag}>`)
 			}
 		})
+	}
+
+	updateBodyListClass() {
+		document.body.classList.add("style-text");
 	}
 }
 

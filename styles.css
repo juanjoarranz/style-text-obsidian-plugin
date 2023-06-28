@@ -7,7 +7,9 @@ If your plugin does not need CSS, delete this file.
 
 */
 
-
+.style-text mark {
+	border-radius: 0.2em;
+}
 
 .container_button {
 	text-align: right;

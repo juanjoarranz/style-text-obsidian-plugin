@@ -11,13 +11,110 @@ If your plugin does not need CSS, delete this file.
 	border-radius: 0.2em;
 }
 
-.container_button {
-	text-align: right;
-	margin-bottom: 20px;
+/* Setting Header */
+.setting-header {
+	display: flex;
+	margin-bottom: 5px;
 }
 
-.container_button button {
-	background-color: var(--interactive-accent)
+div.name-header {
+	padding-left: 10px;
+	flex: 0.28;
+	font-size: 20px;
+}
+
+div.style-header {
+	font-size: 20px;
+	padding-left: 0px;
+	flex: 0.55;
+}
+
+.container_add_button {
+	/* text-align: right;
+	margin-bottom: 20px; */
+	flex: 0.2;
+	display: flex;
+}
+
+.container_add_button button {
+	margin-left: auto;
+	background-color: var(--interactive-accent);
+	font-size: medium;
+}
+
+/* Setting Items */
+.setting-item-container {
+	display: flex;
+	flex-direction: row;
+	border-top: 1px solid var(--background-modifier-border);
+	padding-top: 11px;
+	padding-bottom: 11px;
+	border-bottom: 1px solid var(--background-modifier-border);
+
+}
+
+input.style-text-setting-item-name {
+	/* width: 100%;
+	width: 90%; */
+	flex: 0.3;
+	margin-right: 10px;
+	line-height: var(--line-height-tight);
+
+	-webkit-app-region: no-drag;
+	background: var(--background-modifier-form-field);
+	border: var(--input-border-width) solid var(--background-modifier-border);
+	color: var(--text-normal);
+	font-family: inherit;
+	padding: var(--size-4-1) var(--size-4-2);
+	font-size: var(--font-ui-medium);
+	font-size: 15px;
+	font-weight: normal;
+	border-radius: var(--input-radius);
+	outline: none;
+}
+
+input.style-text-setting-item-name: active {
+	box-shadow: 0 0 0 2px var(--background-modifier-border-focus);
+}
+
+input.style-text-setting-item-name: focus {
+	box-shadow: 0 0 0 2px var(--background-modifier-border-focus);
+	transistion: box-shadow 0.15s ease-in-out, border 0.15s esse-in-out;
+}
+
+/* .setting-item-name input {
+	width: 90%;
+	font-size: 1.05em;
+} */
+
+.style-text-setting-item-css {
+	width: 100%;
+	flex: 0.6;
+}
+
+.style-text-setting-item-css input {
+	width: 100%;
+	font-size: 1.05em;
+}
+
+.style-text-setting-item-contextMenu .checkbox-container {
+	margin-top: 4px;
+	margin-left: 8px
+}
+
+.style-text-button-container {
+	text-align: right;
+	flex: 0.1;
+}
+
+.style-text-delete-style-button {
+	background-color: var(--background-modifier-error);
+}
+
+
+/* Instructions */
+.container-instructions {
+	margin-top: 40px;
 }
 
 .instructions {
@@ -32,32 +129,4 @@ p.instructions {
 
 ul.instructions {
 	margin-top: 1px;
-}
-
-
-.setting-item-container {
-	display: flex;
-	flex-direction: row;
-	border-top: 1px solid var(--background-modifier-border);
-	padding-top: 11px;
-}
-
-.setting-item-text {
-	width: 100%;
-	flex: 0.9;
-}
-
-.setting-item-text input {
-	min-width: 400px;
-	width: 100%;
-}
-
-.delete-button-container {
-	text-align: right;
-	flex: 0.1;
-}
-
-.setting-item-delete-style-button {
-	margin-right: 10px;
-	background-color: var(--background-modifier-error);
 }

@@ -1,12 +1,27 @@
 import { ButtonComponent, PluginSettingTab, Setting } from "obsidian";
 import StyleText from './main';
-
+export interface Style {
+	name: string;
+	css: string;
+	contextMenu: boolean;
+}
 export interface StyleTextSettings {
-	styles: string[];
+	styles: Style[];
 }
 
 export const DEFAULT_SETTINGS: StyleTextSettings = {
-	styles: ["font-size: 28px;", "font-size: 24px;"]
+	styles: [
+		{ name: "Super Big", css: "font-size: 28px;", contextMenu: true },
+		{ name: "Super Big Yellow Highlight", css: "font-size: 28px; background-color: #fff88f; color: black", contextMenu: false },
+		{ name: "Big", css: "font-size: 24px", contextMenu: false },
+		{ name: "Big Green Highlight", css: "font-size: 24px; background-color: #1EFF00; color: black", contextMenu: true },
+		{ name: "Large", css: "font-size: 20px", contextMenu: false },
+		{ name: "Large Yellow", css: "font-size: 20px; color: yellow", contextMenu: false },
+		{ name: "Large Orange", css: "font-size: 20px; color: orange", contextMenu: true },
+		{ name: "Large Red", css: "font-size: 20px; color: red", contextMenu: false },
+		{ name: "Green Highlight", css: "background-color: #1EFF00; color: black", contextMenu: true },
+		{ name: "Yellow Highlight", css: "background-color: #fff88f; color: black", contextMenu: true },
+	]
 }
 
 export class GeneralSettingsTab extends PluginSettingTab {
@@ -21,18 +36,25 @@ export class GeneralSettingsTab extends PluginSettingTab {
 	display() {
 		const { containerEl } = this;
 
+		this.clearHtml();
+
 		containerEl.empty();
 		containerEl.createEl('div').createEl('span', { text: 'Created by ' }).createEl('a', { text: 'Juanjo Arranz', href: 'https://github.com/juanjoarranz' });
 
 		containerEl.createEl('p', { text: 'CSS styles to be applied to the selected text.' });
 
+		const settingHeader: HTMLDivElement = containerEl.createDiv({ cls: "setting-header" });
+		settingHeader.createDiv({ text: "Name", cls: "name-header" });
+		settingHeader.createDiv({ text: "Style", cls: "style-header" });
+
 		// Add Style Button
-		let containerButton = containerEl.createEl('div', { cls: 'container_button' });
+		let containerButton = settingHeader.createEl('div', { cls: 'container_add_button' });
 		let addStyleButton = containerButton.createEl('button', { text: 'Add Style' });
 
 		// Setting Items
 		const settingContainer: HTMLDivElement = containerEl.createDiv();
 		addStyleButton.onclick = ev => this.addStyle(settingContainer);
+
 		this.plugin.settings.styles.forEach((s, i) => this.addStyle(settingContainer, i + 1));
 
 		this.addInstructions(containerEl);
@@ -40,65 +62,173 @@ export class GeneralSettingsTab extends PluginSettingTab {
 		this.donate(containerEl);
 	}
 
+
+	private clearHtml() {
+		// remove disruptive classes and elements
+		setTimeout(() => {
+			removeClass("setting-item");
+			removeClass("setting-item-info");
+			removeClass("setting-item-control");
+			deleteContainer(".setting-item-description");
+		}, 0);
+
+		function removeClass(className: string) {
+			document.querySelectorAll("." + className)
+				.forEach(i => i.removeClass(className));
+		}
+
+		function deleteContainer(selector: string) {
+			document.querySelectorAll(selector)
+				.forEach(i => i.parentElement?.remove());
+		}
+	}
+
 	private addStyle(containerEl: HTMLElement, counter?: number) {
 
-		const settingItemContainer: HTMLDivElement = containerEl.createDiv({ cls: 'setting-item-container' });
-		const stylesCounter = counter ?? this.plugin.settings.styles.length + 1;
-		const newStyle = "font-size: 20px; color: yellow";
+		this.clearHtml();
 
-		new Setting(settingItemContainer)
-			.setClass('setting-item-text')
-			.setName(`CSS Style ${stylesCounter}`)
-			.addText(text => {
-				if (!counter) this.plugin.settings.styles.push(newStyle);
-				return text.setValue(this.plugin.settings.styles[stylesCounter - 1] ?? newStyle)
-					.onChange(async (value) => {
-						this.plugin.settings.styles[stylesCounter - 1] = value;
-						await this.plugin.saveSettings();
-						this.plugin.addStyleCommand(value, stylesCounter);
-					})
-			});
+		const { styles } = this.plugin.settings;
+
+		const settingItemContainer: HTMLDivElement = containerEl.createDiv({ cls: 'setting-item-container' });
+		const stylesCounter = counter ?? styles.length + 1; // 1-based
 
 		if (!counter) {
+			const newStyle: Style = { name: "Large Yellow", css: "font-size: 20px; color: yellow", contextMenu: false };
+			styles.push(newStyle);
 			this.plugin.addStyleCommand(newStyle, stylesCounter);
 			this.plugin.saveSettings();
 		}
 
-		// delete button
-		const deleteButtonContainer: HTMLDivElement = settingItemContainer.createDiv({ cls: 'delete-button-container' });
-		const deleteButton: ButtonComponent = new ButtonComponent(deleteButtonContainer);
-		deleteButton.setIcon('trash-2').setClass('setting-item-delete-style-button')
+		const currentStyle = styles[stylesCounter - 1];
+
+		// Style Name
+		let styleNameInput = settingItemContainer.createEl('input', { cls: 'style-text-setting-item-name' });
+		styleNameInput.value = currentStyle.name;
+		styleNameInput.onchange = (async (event) => {
+			const value = styleNameInput.value;
+			currentStyle.name = value;
+			await this.plugin.saveSettings();
+			this.plugin.addStyleCommand({
+				name: value,
+				css: currentStyle.css,
+				contextMenu: currentStyle.contextMenu
+			}, stylesCounter + 1);
+		});
+
+		// Style
+		// new Setting(settingItemContainer)
+		// 	.setClass('setting-item-name')
+		// 	.addText(text => {
+		// 		return text.setValue(this.plugin.settings.styles[stylesCounter - 1]?.name ?? newStyle.name)
+		// 			.onChange(async (value) => {
+		// 				this.plugin.settings.styles[stylesCounter - 1].name = value;
+		// 				await this.plugin.saveSettings();
+		// 				this.plugin.addStyleCommand({
+		// 					name: value,
+		// 					css: this.plugin.settings.styles[stylesCounter - 1].css
+		// 				}, stylesCounter);
+		// 			})
+		// 	});
+		new Setting(settingItemContainer)
+			.setClass('style-text-setting-item-css')
+			.addText(text => {
+				return text.setValue(currentStyle.css)
+					.onChange(async (value) => {
+						currentStyle.css = value;
+						await this.plugin.saveSettings();
+						this.plugin.addStyleCommand({
+							name: currentStyle.name,
+							css: value,
+							contextMenu: currentStyle.contextMenu
+						}, stylesCounter + 1);
+					})
+			});
+
+		// Toggle Context Menu
+		new Setting(settingItemContainer)
+			.setClass('style-text-setting-item-contextMenu')
+			.addToggle(toggle => {
+				toggle.setValue(currentStyle.contextMenu)
+					.setTooltip((toggle.getValue() ? "disable" : "enable") + " contex menu")
+					.onChange(async () => {
+						const value = toggle.getValue();
+						toggle.setTooltip((value ? "disable" : "enable") + " contex menu");
+						currentStyle.contextMenu = value;
+						await this.plugin.saveSettings();
+					})
+			});
+
+		// Up Button
+		const upDisabled = stylesCounter - 1 === 0;
+		const upButtonContainer = settingItemContainer.createDiv({ cls: 'style-text-button-container' });
+		if (!upDisabled) {
+			const upButton = new ButtonComponent(upButtonContainer);
+			upButton.setIcon('arrow-up').setClass('style-text-delete-style-button')
+				.setTooltip("Move up")
+				.onClick(() => this.moveStyle("up", stylesCounter, styles));
+		}
+
+		// Down Button
+		const downDisabled = (stylesCounter === styles.length);
+		const downButtonContainer = settingItemContainer.createDiv({ cls: 'style-text-button-container' });
+		if (!downDisabled) {
+			const downButton = new ButtonComponent(downButtonContainer);
+			downButton.setIcon('arrow-down').setClass('style-text-delete-style-button')
+				.setTooltip("Move down")
+				.onClick(() => this.moveStyle("down", stylesCounter, styles));
+		}
+
+		// Delete Button
+		const deleteButtonContainer = settingItemContainer.createDiv({ cls: 'style-text-button-container' });
+		const deleteButton = new ButtonComponent(deleteButtonContainer);
+		deleteButton.setIcon('trash-2').setClass('style-text-delete-style-button')
+			.setTooltip("Remove Style")
 			.onClick(async () => {
 				this.plugin.settings.styles.splice(stylesCounter - 1, 1);
 				await this.plugin.saveSettings();
 				this.display();
 			});
+
+		if (!counter) setTimeout(() => this.display(), 0);
+	}
+
+	private async moveStyle(direction: "up" | "down", stylesCounter: number, styles: Style[]) {
+		this.plugin.settings.styles = moveStyle(direction, stylesCounter, styles);
+		await this.plugin.saveSettings();
+		this.plugin.settings.styles.forEach((style, index) => {
+			this.plugin.addStyleCommand(style, index + 1);
+		});
+		this.display();
+
+		function moveStyle(direction: "up" | "down", stylesCounter: number, styles: Style[]): Style[] {
+			const movingStyle = styles.splice(stylesCounter - 1, 1)[0];
+			const newPosition = direction === "up" ? stylesCounter - 2 : stylesCounter;
+			const newStyles = [
+				...styles.slice(0, newPosition),
+				movingStyle,
+				...styles.slice(newPosition)
+			];
+			return newStyles;
+		}
 	}
 
 	private addInstructions(containerEl: HTMLElement) {
+
+		const containerInstructions = containerEl.createEl('div', { cls: 'container-instructions' });
+
 		// Instructions
 		// With Command Palette
-		containerEl.createEl('p', { text: 'Usage with the Command Palette:', cls: 'instructions' });
-		const commandPaletteUl = containerEl.createEl('ul', { cls: 'instructions' });
+		containerInstructions.createEl('p', { text: 'Usage with the Command Palette:', cls: 'instructions' });
+		const commandPaletteUl = containerInstructions.createEl('ul', { cls: 'instructions' });
 		commandPaletteUl.createEl('li', { text: 'Select text on the editor' });
 		commandPaletteUl.createEl('li', { text: 'Open the Command Palette: <Ctrl> or <Cmd> + <P>' });
-		commandPaletteUl.createEl('li', { text: 'Look up the Style to apply: "Style Text 1 ..."' });
+		commandPaletteUl.createEl('li', { text: 'Look up the Style to apply: "Style Text ..."' });
 		commandPaletteUl.createEl('li', { text: 'Choose the Style: <Enter>' });
 
-		// With Commander Plugin
-		containerEl.createEl('p', { text: 'Usage with Commander Plugin:', cls: 'instructions' });
-		const commanderUl = containerEl.createEl('ul', { cls: 'instructions' });
-		commanderUl.createEl('li').createEl('a', { text: 'Install and enable Commander Plugin', href: 'https://github.com/phibr0/obsidian-commander' });
-		commanderUl.createEl('li', { text: 'Open the Editor Menu Setting of Commander Plugin' });
-		commanderUl.createEl('li', { text: 'Look up the Style to apply: "Style Text 1 ..."' });
-		commanderUl.createEl('li', { text: 'Choose the Style: <Enter>' });
-		commanderUl.createEl('li', { text: 'Choose an Icon' });
-		commanderUl.createEl('li', { text: 'Choose a Custom Name for the new Command' });
-		commanderUl.createEl('li', { text: 'The command will be availble from the editor by right-clicking on a selected text', cls: 'instructions' });
 
-		// With Commander Plugin
-		containerEl.createEl('p', { text: 'Remove Applied Styles:', cls: 'instructions' });
-		const removeUl = containerEl.createEl('ul', { cls: 'instructions' });
+		// Remove Applied Styles
+		containerInstructions.createEl('p', { text: 'Remove Applied Styles:', cls: 'instructions' });
+		const removeUl = containerInstructions.createEl('ul', { cls: 'instructions' });
 		removeUl.createEl('li', { text: 'Select the styled text on the editor' });
 		removeUl.createEl('li', { text: 'Open the Command Palette: <Ctrl> or <Cmd> + <P>' });
 		removeUl.createEl('li', { text: 'Look up: "Style Remove"' });

@@ -19,14 +19,14 @@ If your plugin does not need CSS, delete this file.
 
 div.name-header {
 	padding-left: 10px;
-	flex: 0.3;
+	flex: 0.28;
 	font-size: 20px;
 }
 
 div.style-header {
 	font-size: 20px;
-	padding-left: 30px;
-	flex: 0.5;
+	padding-left: 0px;
+	flex: 0.55;
 }
 
 .container_add_button {
@@ -39,6 +39,7 @@ div.style-header {
 .container_add_button button {
 	margin-left: auto;
 	background-color: var(--interactive-accent);
+	font-size: medium;
 }
 
 /* Setting Items */
@@ -66,6 +67,8 @@ input.style-text-setting-item-name {
 	font-family: inherit;
 	padding: var(--size-4-1) var(--size-4-2);
 	font-size: var(--font-ui-medium);
+	font-size: 15px;
+	font-weight: normal;
 	border-radius: var(--input-radius);
 	outline: none;
 }
@@ -79,34 +82,32 @@ input.style-text-setting-item-name: focus {
 	transistion: box-shadow 0.15s ease-in-out, border 0.15s esse-in-out;
 }
 
-.setting-item-contextMenu .checkbox-container {
-	margin-top: 4px;
-	margin-left: 8px
-}
-
 /* .setting-item-name input {
 	width: 90%;
 	font-size: 1.05em;
 } */
 
-
-.setting-item-css {
+.style-text-setting-item-css {
 	width: 100%;
 	flex: 0.6;
 }
 
-.setting-item-css input {
+.style-text-setting-item-css input {
 	width: 100%;
 	font-size: 1.05em;
 }
 
-.delete-button-container {
+.style-text-setting-item-contextMenu .checkbox-container {
+	margin-top: 4px;
+	margin-left: 8px
+}
+
+.style-text-button-container {
 	text-align: right;
 	flex: 0.1;
 }
 
-.setting-item-delete-style-button {
-	margin-right: 10px;
+.style-text-delete-style-button {
 	background-color: var(--background-modifier-error);
 }
 

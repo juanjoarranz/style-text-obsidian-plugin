@@ -11,8 +11,16 @@ export interface StyleTextSettings {
 
 export const DEFAULT_SETTINGS: StyleTextSettings = {
 	styles: [
-		{ name: "Super Big Font", css: "font-size: 28px;", contextMenu: false },
-		{ name: "Big Font", css: "font-size: 24px;", contextMenu: false }
+		{ name: "Super Big", css: "font-size: 28px;", contextMenu: true },
+		{ name: "Super Big Yellow Highlight", css: "font-size: 28px; background-color: #fff88f; color: black", contextMenu: false },
+		{ name: "Big", css: "font-size: 24px", contextMenu: false },
+		{ name: "Big Green Highlight", css: "font-size: 24px; background-color: #1EFF00; color: black", contextMenu: true },
+		{ name: "Large", css: "font-size: 20px", contextMenu: false },
+		{ name: "Large Yellow", css: "font-size: 20px; color: yellow", contextMenu: false },
+		{ name: "Large Orange", css: "font-size: 20px; color: orange", contextMenu: true },
+		{ name: "Large Red", css: "font-size: 20px; color: red", contextMenu: false },
+		{ name: "Green Highlight", css: "background-color: #1EFF00; color: black", contextMenu: true },
+		{ name: "Yellow Highlight", css: "background-color: #fff88f; color: black", contextMenu: true },
 	]
 }
 
@@ -79,20 +87,23 @@ export class GeneralSettingsTab extends PluginSettingTab {
 
 		this.clearHtml();
 
+		const { styles } = this.plugin.settings;
+
 		const settingItemContainer: HTMLDivElement = containerEl.createDiv({ cls: 'setting-item-container' });
-		const stylesCounter = counter ?? this.plugin.settings.styles.length + 1;
-		const newStyle: Style = { name: "Medium Size Yellow", css: "font-size: 20px; color: yellow", contextMenu: false };
+		const stylesCounter = counter ?? styles.length + 1; // 1-based
 
 		if (!counter) {
-			this.plugin.settings.styles.push(newStyle);
+			const newStyle: Style = { name: "Large Yellow", css: "font-size: 20px; color: yellow", contextMenu: false };
+			styles.push(newStyle);
 			this.plugin.addStyleCommand(newStyle, stylesCounter);
 			this.plugin.saveSettings();
 		}
 
-		const currentStyle = this.plugin.settings.styles[stylesCounter - 1];
+		const currentStyle = styles[stylesCounter - 1];
 
+		// Style Name
 		let styleNameInput = settingItemContainer.createEl('input', { cls: 'style-text-setting-item-name' });
-		styleNameInput.value = currentStyle.name ?? newStyle.name;
+		styleNameInput.value = currentStyle.name;
 		styleNameInput.onchange = (async (event) => {
 			const value = styleNameInput.value;
 			currentStyle.name = value;
@@ -101,9 +112,10 @@ export class GeneralSettingsTab extends PluginSettingTab {
 				name: value,
 				css: currentStyle.css,
 				contextMenu: currentStyle.contextMenu
-			}, stylesCounter);
+			}, stylesCounter + 1);
 		});
 
+		// Style
 		// new Setting(settingItemContainer)
 		// 	.setClass('setting-item-name')
 		// 	.addText(text => {
@@ -117,11 +129,10 @@ export class GeneralSettingsTab extends PluginSettingTab {
 		// 				}, stylesCounter);
 		// 			})
 		// 	});
-
 		new Setting(settingItemContainer)
-			.setClass('setting-item-css')
+			.setClass('style-text-setting-item-css')
 			.addText(text => {
-				return text.setValue(currentStyle.css ?? newStyle.css)
+				return text.setValue(currentStyle.css)
 					.onChange(async (value) => {
 						currentStyle.css = value;
 						await this.plugin.saveSettings();
@@ -129,12 +140,13 @@ export class GeneralSettingsTab extends PluginSettingTab {
 							name: currentStyle.name,
 							css: value,
 							contextMenu: currentStyle.contextMenu
-						}, stylesCounter);
+						}, stylesCounter + 1);
 					})
 			});
 
+		// Toggle Context Menu
 		new Setting(settingItemContainer)
-			.setClass('setting-item-contextMenu')
+			.setClass('style-text-setting-item-contextMenu')
 			.addToggle(toggle => {
 				toggle.setValue(currentStyle.contextMenu)
 					.setTooltip((toggle.getValue() ? "disable" : "enable") + " contex menu")
@@ -146,15 +158,58 @@ export class GeneralSettingsTab extends PluginSettingTab {
 					})
 			});
 
-		// delete button
-		const deleteButtonContainer: HTMLDivElement = settingItemContainer.createDiv({ cls: 'delete-button-container' });
-		const deleteButton: ButtonComponent = new ButtonComponent(deleteButtonContainer);
-		deleteButton.setIcon('trash-2').setClass('setting-item-delete-style-button')
+		// Up Button
+		const upDisabled = stylesCounter - 1 === 0;
+		const upButtonContainer = settingItemContainer.createDiv({ cls: 'style-text-button-container' });
+		if (!upDisabled) {
+			const upButton = new ButtonComponent(upButtonContainer);
+			upButton.setIcon('arrow-up').setClass('style-text-delete-style-button')
+				.setTooltip("Move up")
+				.onClick(() => this.moveStyle("up", stylesCounter, styles));
+		}
+
+		// Down Button
+		const downDisabled = (stylesCounter === styles.length);
+		const downButtonContainer = settingItemContainer.createDiv({ cls: 'style-text-button-container' });
+		if (!downDisabled) {
+			const downButton = new ButtonComponent(downButtonContainer);
+			downButton.setIcon('arrow-down').setClass('style-text-delete-style-button')
+				.setTooltip("Move down")
+				.onClick(() => this.moveStyle("down", stylesCounter, styles));
+		}
+
+		// Delete Button
+		const deleteButtonContainer = settingItemContainer.createDiv({ cls: 'style-text-button-container' });
+		const deleteButton = new ButtonComponent(deleteButtonContainer);
+		deleteButton.setIcon('trash-2').setClass('style-text-delete-style-button')
+			.setTooltip("Remove Style")
 			.onClick(async () => {
 				this.plugin.settings.styles.splice(stylesCounter - 1, 1);
 				await this.plugin.saveSettings();
 				this.display();
 			});
+
+		if (!counter) setTimeout(() => this.display(), 0);
+	}
+
+	private async moveStyle(direction: "up" | "down", stylesCounter: number, styles: Style[]) {
+		this.plugin.settings.styles = moveStyle(direction, stylesCounter, styles);
+		await this.plugin.saveSettings();
+		this.plugin.settings.styles.forEach((style, index) => {
+			this.plugin.addStyleCommand(style, index + 1);
+		});
+		this.display();
+
+		function moveStyle(direction: "up" | "down", stylesCounter: number, styles: Style[]): Style[] {
+			const movingStyle = styles.splice(stylesCounter - 1, 1)[0];
+			const newPosition = direction === "up" ? stylesCounter - 2 : stylesCounter;
+			const newStyles = [
+				...styles.slice(0, newPosition),
+				movingStyle,
+				...styles.slice(newPosition)
+			];
+			return newStyles;
+		}
 	}
 
 	private addInstructions(containerEl: HTMLElement) {

@@ -69,30 +69,62 @@ export default class StyleText extends Plugin {
 	}
 
 	styleTextInContextMenu = (menu: Menu, editor: Editor) => {
-		const enhancedApp = this.app as EnhancedApp;
+    const enhancedApp = this.app as EnhancedApp;
 
-		menu.addItem((item) =>
-			item
-				.setTitle("Remove Style")
-				.setIcon("eraser")
-				.onClick(() => {
-					enhancedApp.commands.executeCommandById(`style-text:remove-style`);
-				})
-		);
+    menu.addItem((item) =>
+        item
+            .setTitle("Remove Style")
+            .setIcon("eraser")
+            .onClick(() => {
+                enhancedApp.commands.executeCommandById(`style-text:remove-style`);
+            })
+    );
 
-		this.settings.styles.forEach((style, index) => {
-			if (style.contextMenu) {
-				menu.addItem((item) =>
-					item
-						.setTitle(style.name)
-						.setIcon("highlighter")
-						.onClick(() => {
-							enhancedApp.commands.executeCommandById(`style-text:style${index + 1}`);
-						})
-				);
-			}
-		});
+    const addStyleItems = (submenu: Menu) => {
+        this.settings.styles.forEach((style, index) => {
+            if (style.contextMenu) {
+                submenu.addItem((item) =>
+                    item
+                        .setTitle(style.name)
+                        .setIcon("highlighter")
+                        .onClick(() => {
+                            enhancedApp.commands.executeCommandById(`style-text:style${index + 1}`);
+                        })
+                );
+            }
+        });
+    };
+
+		if (this.settings.groupContextMenu) {
+			menu.addItem((item) => {
+					item.setTitle("Style selected text")
+							.setIcon("highlighter");
+					
+					// @ts-ignore
+					item.setSubmenu();
+	
+					const submenu = new Menu();
+					this.settings.styles.forEach((style, index) => {
+							if (style.contextMenu) {
+									submenu.addItem((subItem) =>
+											subItem
+													.setTitle(style.name)
+													.setIcon("highlighter")
+													.onClick(() => {
+															enhancedApp.commands.executeCommandById(`style-text:style${index + 1}`);
+													})
+									);
+							}
+					});
+					// @ts-ignore
+					item.submenu = submenu;
+			});
+	} else {
+			addStyleItems(menu);
 	}
+	
+};
+
 
 	updateBodyListClass() {
 		document.body.classList.add("style-text");

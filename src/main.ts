@@ -57,13 +57,21 @@ export default class StyleText extends Plugin {
 	// index: 1-based
 	addStyleCommand(style: Style, index: number) {
 		const isHighlight = style.css.indexOf("background-color") !== -1;
+		const isCallout = style.css.indexOf(">") !== -1;
 		const tag = isHighlight ? "mark" : "span";
 		this.addCommand({
 			id: `style${index}`,
 			name: `${style.name}`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
-				const selection = editor.getSelection();
-				editor.replaceSelection(`<${tag} style="${style.css}">${selection}</${tag}>`);
+				let selection = editor.getSelection();
+
+				if (!isCallout) {
+					editor.replaceSelection(`<${tag} style="${style.css}">${selection}</${tag}>`);
+
+				} else { // isCallout
+					selection = selection.replace(/\n/g, "\n> ");
+					editor.replaceSelection(`${style.css} ${selection}`);
+				}
 			}
 		});
 	}

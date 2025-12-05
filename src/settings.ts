@@ -159,9 +159,9 @@ export class GeneralSettingsTab extends PluginSettingTab {
 			});
 
 		// Up Button
-		const upDisabled = stylesCounter - 1 === 0;
-		const upButtonContainer = settingItemContainer.createDiv({ cls: 'style-text-button-container' });
+		const upDisabled = stylesCounter === 1;
 		if (!upDisabled) {
+			const upButtonContainer = settingItemContainer.createDiv({ cls: 'style-text-button-container' });
 			const upButton = new ButtonComponent(upButtonContainer);
 			upButton.setIcon('arrow-up').setClass('style-text-delete-style-button')
 				.setTooltip("Move up")
@@ -170,8 +170,8 @@ export class GeneralSettingsTab extends PluginSettingTab {
 
 		// Down Button
 		const downDisabled = (stylesCounter === styles.length);
-		const downButtonContainer = settingItemContainer.createDiv({ cls: 'style-text-button-container' });
 		if (!downDisabled) {
+			const downButtonContainer = settingItemContainer.createDiv({ cls: 'style-text-button-container' });
 			const downButton = new ButtonComponent(downButtonContainer);
 			downButton.setIcon('arrow-down').setClass('style-text-delete-style-button')
 				.setTooltip("Move down")

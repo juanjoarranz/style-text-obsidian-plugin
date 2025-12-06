@@ -1,4 +1,4 @@
-import { ButtonComponent, PluginSettingTab, Setting } from "obsidian";
+import { ButtonComponent, PluginSettingTab, Setting, ToggleComponent } from "obsidian";
 import StyleText from './main';
 export interface Style {
 	name: string;
@@ -6,10 +6,12 @@ export interface Style {
 	contextMenu: boolean;
 }
 export interface StyleTextSettings {
+	groupContextMenu: boolean;
 	styles: Style[];
 }
 
 export const DEFAULT_SETTINGS: StyleTextSettings = {
+	groupContextMenu: false,
 	styles: [
 		{ name: "Super Big", css: "font-size: 28px;", contextMenu: true },
 		{ name: "Super Big Yellow Highlight", css: "font-size: 28px; background-color: #fff88f; color: black", contextMenu: false },
@@ -56,7 +58,21 @@ export class GeneralSettingsTab extends PluginSettingTab {
 		addStyleButton.onclick = ev => this.addStyle(settingContainer);
 
 		this.plugin.settings.styles.forEach((s, i) => this.addStyle(settingContainer, i + 1));
-
+		
+		const groupSettingContainer = containerEl.createDiv({ cls: 'setting-item group-context-menu-setting' });
+		groupSettingContainer.style.cssText = 'display: flex; justify-content: space-between; align-items: center;';
+		
+		const infoContainer = groupSettingContainer.createDiv({ cls: 'setting-item-info' });
+		infoContainer.createEl('div', { cls: 'setting-item-name', text: 'Group context menu' });
+		infoContainer.createEl('div', { cls: 'setting-item-description', text: 'Combine styles into a submenu in the context menu' });
+		
+		new ToggleComponent(groupSettingContainer.createDiv({ cls: 'setting-item-control' }))
+				.setValue(this.plugin.settings.groupContextMenu)
+				.onChange(async (value) => {
+						this.plugin.settings.groupContextMenu = value;
+						await this.plugin.saveSettings();
+				});
+		
 		this.addInstructions(containerEl);
 
 		this.donate(containerEl);
@@ -65,18 +81,18 @@ export class GeneralSettingsTab extends PluginSettingTab {
 
 	private clearHtml() {
 		// remove disruptive classes and elements
-		setTimeout(() => {
-			removeClass("setting-item");
-			removeClass("setting-item-info");
-			removeClass("setting-item-control");
-			deleteContainer(".setting-item-description");
-		}, 0);
-
-		function removeClass(className: string) {
-			document.querySelectorAll("." + className)
-				.forEach(i => i.removeClass(className));
-		}
-
+			setTimeout(() => {
+					removeClass("setting-item", ".group-context-menu-setting");
+					removeClass("setting-item-info", ".group-context-menu-setting");
+					removeClass("setting-item-control", ".group-context-menu-setting");
+					deleteContainer(".setting-item-description:not(.group-context-menu-setting .setting-item-description)");
+			}, 0);
+	
+			function removeClass(className: string, excludeSelector: string) {
+					document.querySelectorAll(`.${className}:not(${excludeSelector})`)
+							.forEach(i => i.removeClass(className));
+			}
+	
 		function deleteContainer(selector: string) {
 			document.querySelectorAll(selector)
 				.forEach(i => i.parentElement?.remove());
